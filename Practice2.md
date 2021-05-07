@@ -29,5 +29,6 @@ $ docker-compose up -d
 
 
 # Result
-Go to *http://localhost:8080* or *https://localhost:8443* to test
-![image](https://user-images.githubusercontent.com/43313369/117467889-50b96700-af7e-11eb-98ae-98468c31f484.png)
+Go to *http://localhost:80* or *https://localhost:443* to test
+![image](https://user-images.githubusercontent.com/43313369/117469566-1650c980-af80-11eb-8064-aa5f79dfeade.png)
+
