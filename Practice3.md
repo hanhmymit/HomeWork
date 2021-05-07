@@ -49,7 +49,7 @@ $ docker run -d --name wordpress \
 Default image WordPress use `mariadb` is hostname  => Add hostname to /etc/hosts on container run WordPress 
 ```console
 $ docker exec -it -u root wordpress bash
-$ echo "192.168.5.10 mariadb2 mariadb2" >> /etc/hosts 
+$ echo "192.168.5.10 mariadb mariadb" >> /etc/hosts 
 ```
 ---
 **NOTE**
