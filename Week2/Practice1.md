@@ -51,6 +51,49 @@ inventory = {path_your_own_inventory_file}
 ...
 ```
 
+you can create with ``` .yaml ``` to use ``` vault ```  ( ! change variable 'inventory' in ``` ansible.cfg``` file )
+```console
+---
+db:
+ hosts:
+  192.168.5.10:
+ vars:
+  ansible_user: thang
+  ansible_ssh_pass: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          39366338373162316561613632616164636530376139613332313639396532623632326437616437
+          6134653935396333366533643662383234353764643065650a643162666539353834643965363134
+          64376238363161386662383330363335316531363161646633646538366431633965646233623939
+          3835653662383764330a343239626266383464626364633634333661373264366530653232353230
+          6561
+  ansible_become_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          39366338373162316561613632616164636530376139613332313639396532623632326437616437
+          6134653935396333366533643662383234353764643065650a643162666539353834643965363134
+          64376238363161386662383330363335316531363161646633646538366431633965646233623939
+          3835653662383764330a343239626266383464626364633634333661373264366530653232353230
+          6561
+web:
+ hosts:
+  192.168.5.11:
+  192.168.5.12:
+ vars:
+  ansible_user: thang2
+  ansible_ssh_pass: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          36623064303234373739333634313430353739616663343332353065666233633834666262386431
+          3762383537616231373061643835643962343239363562360a306633656262636364643363373337
+          61336136653362366262653036383764383066386631393561383730656663373133323430386638
+          6632666238386333630a383936363030313031636230646535393135386665663531363430613338
+          3733
+  ansible_become_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          36623064303234373739333634313430353739616663343332353065666233633834666262386431
+          3762383537616231373061643835643962343239363562360a306633656262636364643363373337
+          61336136653362366262653036383764383066386631393561383730656663373133323430386638
+          6632666238386333630a383936363030313031636230646535393135386665663531363430613338
+          3733
+```
 #### Step 4: Test Ansible with your own ```ansible.cfg``` file
 ping all machine you defined on your own ```inventory.ini``` file
 ```console 
@@ -99,6 +142,31 @@ Download file docker-compose.yml then run
     command: docker-compose up -d
     args:
      chdir: /home
+```
+#### Step 7: Deploy WordPress,MariaDb with Command Line
+Create Network --> create volume --> run mariadb -> run wordpress
+```console
+---
+- name: Install MariaDb
+  hosts: web
+  gather_facts: false
+
+  tasks:
+  - name: create network
+    become: yes
+    command: docker network create wordpress-network
+  - name: create volume for db
+    become: yes
+    command: docker volume create --name mariadb_data
+  - name:  run image mariadb
+    become: yes
+    command: docker run -d --name mariadb --env ALLOW_EMPTY_PASSWORD=yes --env MARIADB_USER=bn_wordpress --env MARIADB_PASSWORD=bitnami --env MARIADB_DATABASE=bitnami_wordpress --network wordpress-network --volume mariadb_data:/bitnami/mariadb bitnami/mariadb:latest
+  - name: create volume for web
+    become: yes
+    command: docker volume create --name wordpress_data
+  - name:  run image wordpress
+    become: yes
+    command: docker run -d --name wordpress -p 80:8080 -p 443:8443  --env ALLOW_EMPTY_PASSWORD=yes --env WORDPRESS_DATABASE_USER=bn_wordpress  --env WORDPRESS_DATABASE_PASSWORD=bitnami  --env WORDPRESS_DATABASE_NAME=bitnami_wordpress --network wordpress-network --volume wordpress_data:/bitnami/wordpress  bitnami/wordpress:latest
 ```
 # Result
 Go to *http://localhost:80* or *https://localhost:443* to test
